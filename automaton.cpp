@@ -31,6 +31,7 @@ int main(int argc, char *argv[]){
 
   while (str[i] != '\0') {    
     c = wich_case(str[i]);
+    printf("s:%d c:%d mantisa:%d\n", s, c, mantisa);
     switch (s) {
       case 0:
         if (c == 1){
@@ -52,24 +53,24 @@ int main(int argc, char *argv[]){
       case 2:
         if (c == 2) {
           s = 3;
-        }else if (c == 3) {
-          s = 5;
-        }else 
-        {
+        }else{
           s = -1;
         }     
         break;
       case 3:
         if (c == 1) {
           s = 4;
+          mantisa++;
         }else {
           s = -1;
         }
+        break;
       case 4:
-        if (c == 1 &&  mantisa < 2) {
+        if (c == 1 && mantisa < 2) {
           s = 4;
           mantisa++;
-        }else if (c == 3) {
+        }
+        else if (c == 3) {
           s = 5;
         }else {
           s = -1;
@@ -90,6 +91,7 @@ int main(int argc, char *argv[]){
         }else {
           s = -1;
         }
+        break;
       case 7:
         if (c == 1) {
           s = 7;
