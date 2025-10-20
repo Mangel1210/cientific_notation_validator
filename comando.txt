@@ -1,0 +1,1 @@
+while read input; do echo "$input -> $(./at "$input")"; done < test_cases.txt

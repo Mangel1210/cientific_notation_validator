@@ -48,7 +48,6 @@ int main(int argc, char *argv[])
 }
 
 int int_len(char *str){
-  //Se cambiara esta funcion, revisar las que la usan
   int len,first_ceros,i;
 
   len = 0;
