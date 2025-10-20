@@ -10,27 +10,49 @@ int char_to_int(char *pow_arr, int arr_len);
 int n_digits(int num);
 void int_to_char(int num, char *pow_arr, int arr_len);
 void corr_pow(char *str, int n_spaces, char *pow_arr, int arr_len);
-void correct_expr(char *str);
+void correct_expr(char *str, char *expr);
+void to_no_mantisa_case(char *str, char *expr);
+int error_case(char *str);
 
 int main(int argc, char *argv[])
 {
-  int correct;
+  int correct, error;
+  char expr[100], exprf[100];
+  //expr[99] = '\0';
+  //exprf[99] = '\0';
+
+  error = error_case(argv[1]);
   
-  correct = is_correct(argv[1]);
-  
-  if (!correct){
-    correct_expr(argv[1]);
+  printf("ERROR : %d\n", error);
+  if (error == 0) {
+    correct = is_correct(argv[1]);
+    if (!correct) {
+      correct_expr(argv[1], expr);
+    }
+  }else if (error == 1) {
+    to_no_mantisa_case(argv[1], expr);
+    correct_expr(expr, exprf);
+  }else if (error == 2) {
+    std::cout << "Expresión inválida" << '\n';
+    return -1;
   }
-  
+
   return 0;
 }
 
 int int_len(char *str){
-  int len,i;
+  //Se cambiara esta funcion, revisar las que la usan
+  int len,first_ceros,i;
 
   len = 0;
   i = 0;
+  first_ceros = 1;
   while (str[i] != '.') {
+    if (str[i] == '0' && first_ceros) {
+      i++;
+      continue;
+    }
+    first_ceros = 0;
     len++;
     i++;
   }
@@ -105,6 +127,10 @@ int n_digits(int num){
     num *= -1;
   }
 
+  if (num == 0) {
+    return 1;
+  }
+
   n_digits = 0;
   while (num > 0) {
     for (i = 0; i < 10; ++i) {
@@ -133,7 +159,7 @@ void int_to_char(int num, char *pow_arr, int arr_len){
   }
   
   j = 0;
-  while (num != 0) {
+  do{
     for (i = 0; i < 10; ++i) {
       if ((num-i)%10 == 0) {
         pow_arr[n_digs-j] = i+48;
@@ -143,7 +169,7 @@ void int_to_char(int num, char *pow_arr, int arr_len){
         break;
       }
     }
-  }
+  }while (num != 0);
 
   if (n_digs + 1 < arr_len) {
     pow_arr[n_digs+1] = '\0';
@@ -168,7 +194,7 @@ void corr_pow(char *str, int n_spaces, char *pow_arr, int arr_len){
 
   j = 0;
   for (i = 0; i < arr_len; ++i) {
-    if (pow_arr[i] == '0') {
+    if (pow_arr[i] == '0' && i == 0){
       continue;
     }
     str[j+e_ind] = pow_arr[i];
@@ -190,14 +216,11 @@ int char_index(char c, char *str){
   return 0;
 }
 
-void correct_expr(char *str){
-  //char sig,d1,d2,d3,m1,m2;
-  int  e_ind, dot_ind, intg, mant, pow_len, i, j, k;
+void correct_expr(char *str, char *expr){
+  int  e_ind, dot_ind, intg, mant, pow_len = 6, i, j, k;
   char digs[4];
-  char *expr = str;
   char pow_arr[pow_len];
 
-  pow_len = 6;
   intg = int_len(str);
   mant = mantisa_len(str);
   i = 0;
@@ -243,11 +266,59 @@ void correct_expr(char *str){
   }
 
   expr[j] = '\0';
-  
-  get_pow(expr, pow_arr);
+  get_pow(str, pow_arr);
   corr_pow(expr, intg-1, pow_arr, pow_len); 
 
   std::cout << "Corrección: "<< expr << '\n';
+}
+
+void to_no_mantisa_case(char *str, char *expr){
+  int dot_ind, e_ind, intg, mantisa, pow_len = 6, i, j, k;
+  char pow_arr[pow_len];
+
+  dot_ind = char_index('.', str);
+  e_ind = char_index('e', str);
+  if (!e_ind) {
+    e_ind = char_index('E', str);
+  }
+
+  intg = int_len(str);
+  mantisa = mantisa_len(str);
+
+  i = 0;
+  
+  while (str[i] == '0' || str[i] == '.' || (str[i] == '-' && str[i+1] == '0') || (str[i] == '-' && str[i+1] == '.')) {
+    i++;
+  }
+
+  j = 0;
+  k = 0;
+
+  if (str[0] == '-' && str[1] == '0'){
+    expr[j] = '-';
+    k = 1;
+  }
+  
+  while (wich_case(str[j+i]) != 3){
+    if (str[j+i] == '.') {
+      i++;
+      continue;
+    }
+    expr[j+k] = str[j+i];
+    j++;
+  }
+
+  expr[j+k] = '.';
+
+  while (str[j+i] != '\0') {
+    expr[j+k+1] = str[j+i];
+    j++;
+  }
+
+  expr[j+k+1] = '\0';
+  
+  get_pow(expr, pow_arr);
+  corr_pow(expr, -e_ind+dot_ind+1, pow_arr, pow_len); 
 }
 
 int is_correct(char *str){
@@ -354,4 +425,46 @@ int wich_case(char c){
   }
 
   return 0;  
+}
+
+int error_case(char *str){
+
+  int caso, mant, dot, e, exp, i;
+
+  caso = 0;
+  mant = 1;
+  exp = 1;
+  e = 0;
+  dot = 0;
+  i = 0;
+  
+
+  if (str[0] == '0' || (wich_case(str[0]) == 4 && str[1] == '0')){
+    caso = 1;
+  }
+
+  while (str[i]){  
+   
+    if (str[i] == '.') {
+      dot = 1;
+    }
+   
+    if (str[i] == 'e' || str[i] == 'E'){
+      e = 1;
+      if (str[i-1] == '.') {
+        mant = 0;
+      }
+      if (str[i+1] == '\0') {
+        exp = 0;
+      }
+    } 
+   
+    i++;
+  }
+
+  if(!dot || !e || !mant || !exp){
+    caso = 2;
+  }
+
+  return caso;
 }
