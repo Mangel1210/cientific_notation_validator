@@ -1,7 +1,10 @@
 #include <iostream>
+#include <regex>
+#include <string>
 
 int wich_case(char c);
 int is_correct(char *str);
+void is_correct_regex(std::string str);
 int int_len(char *str);
 int mantisa_len(char *str);
 int char_index(char c, char *str);
@@ -14,6 +17,7 @@ void correct_expr(char *str, char *expr);
 void to_no_mantisa_case(char *str, char *expr);
 int error_case(char *str);
 
+
 int main(int argc, char *argv[])
 {
   int correct, error;
@@ -22,7 +26,8 @@ int main(int argc, char *argv[])
   //exprf[99] = '\0';
 
   error = error_case(argv[1]);
-  
+ 
+  /*
   if (error == 0) {
     correct = is_correct(argv[1]);
     if (!correct) {
@@ -35,6 +40,9 @@ int main(int argc, char *argv[])
     std::cout << "Expresión inválida" << '\n';
     return -1;
   }
+  */
+
+  is_correct_regex(argv[1]);
 
   return 0;
 }
@@ -466,4 +474,14 @@ int error_case(char *str){
   }
 
   return caso;
+}
+
+void is_correct_regex(std::string str){
+  std::regex r("^[-+]?\\d(\\.\\d{1,2})?[eE][-+]?\\d+$");
+  
+  if(std::regex_match(str, r)) {
+    std::cout << "Notación científica" << '\n';
+  }else {
+    std::cout << "Notación no válida" << '\n';
+  }
 }
