@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 
   error = error_case(argv[1]);
  
-  /*
+  
   if (error == 0) {
     correct = is_correct(argv[1]);
     if (!correct) {
@@ -40,9 +40,9 @@ int main(int argc, char *argv[])
     std::cout << "Expresión inválida" << '\n';
     return -1;
   }
-  */
+  
 
-  is_correct_regex(argv[1]);
+  //is_correct_regex(argv[1]);
 
   return 0;
 }
@@ -296,6 +296,16 @@ void to_no_mantisa_case(char *str, char *expr){
   
   while (str[i] == '0' || str[i] == '.' || (str[i] == '-' && str[i+1] == '0') || (str[i] == '-' && str[i+1] == '.')) {
     i++;
+  }
+
+  if (wich_case(str[i]) == 3) {
+    expr[0] = '0';
+    expr[1] = '.';
+    expr[2] = '0';
+    expr[3] = 'E';
+    expr[4] = '1';
+    expr[5] = '\0';
+    return;
   }
 
   j = 0;
