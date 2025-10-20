@@ -23,7 +23,6 @@ int main(int argc, char *argv[])
 
   error = error_case(argv[1]);
   
-  printf("ERROR : %d\n", error);
   if (error == 0) {
     correct = is_correct(argv[1]);
     if (!correct) {
